@@ -15,17 +15,12 @@ control "s3-objects-no-public-access" do
               select the permisssions tab for the object and remove
               the Public Access permission."
 
-  public_objects = []
 
   aws_s3_buckets.bucket_names.each do |bucket|
     aws_s3_bucket_objects(bucket).keys.each do |key|
-      public_objects << key if aws_s3_bucket_object(bucket_name: bucket, key: key).public?
+      describe aws_s3_bucket_object(bucket_name: bucket, key: key) do
+        it { should_not be_public } 
+      end unless !aws_s3_bucket_object(bucket_name: bucket, key: key).public?
     end
   end
-
-  describe "List of public objects" do
-    subject { public_objects }
-    it { should be_empty }  
-  end
-
 end
