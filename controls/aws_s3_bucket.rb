@@ -19,4 +19,8 @@ control "s3-buckets-no-public-access" do
       it { should_not be_public }
     end
   end
+
+  describe "Control skipped because no S3 buckets were found" do
+    skip "This control is skipped since the aws_s3_buckets resource returned an empty bucket list"
+  end if aws_s3_buckets.bucket_names.empty?
 end

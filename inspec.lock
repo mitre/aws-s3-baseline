@@ -1,8 +1,0 @@
----
-lockfile_version: 1
-depends:
-- name: aws-resource-pack
-  resolved_source:
-    git: https://github.com/aaronlippold/inspec-aws.git
-    ref: 6e5aa8f876594a8e58d759f7cabef1e929dc3519
-  version_constraints: []
