@@ -95,7 +95,7 @@ $ inspec exec /path/to/profile --controls s3-buckets-no-public-access -t aws://
 
 ### Authors
 
-- Author:: Rony Xaiver [rx294@nyu.com](mailto:rx294@nyu.edu)
+- Author:: Rony Xaiver [rxaiver@mitre.org](mailto:rxaiver@mitre.org)
 - Author:: Matthew Dromazos [dromazmj@dukes.jmu.edu](mailto:mattdromazos9@gmail.com )
 - Author:: Aaron Lippold [lippold@gmail.com](mailto:lippold@gmail.com)
 
