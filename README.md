@@ -8,6 +8,19 @@ This [InSpec](https://github.com/chef/inspec) compliance profile verifies that y
 
 InSpec is an open-source run-time framework and rule language used to specify compliance, security, and policy requirements for testing any node in your infrastructure.
 
+## Versioning and State of Development
+This project uses the [Semantic Versioning Policy](https://semver.org/). 
+
+### Branches
+The master branch contains the latest version of the software leading up to a new release. 
+
+Other branches contain feature-specific updates. 
+
+### Tags
+Tags indicate official releases of the project.
+
+Please note 0.x releases are works in progress (WIP) and may change at any time.   
+
 ## Requirements
 
 - [InSpec](http://inspec.io/) at least version 3.x
