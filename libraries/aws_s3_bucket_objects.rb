@@ -48,6 +48,7 @@ class AwsS3BucketObjects < Inspec.resource(1)
   filter = FilterTable.create
   filter.register_custom_matcher(:exists?) { |x| !x.entries.empty? }
   filter.register_column(:keys, field: :key)
+  filter.register_column(:public_objects, field: :public)
   filter.install_filter_methods_on_resource(self, :table)
 
   def to_s
