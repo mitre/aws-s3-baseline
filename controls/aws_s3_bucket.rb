@@ -24,5 +24,4 @@ control "s3-buckets-no-public-access" do
     impact 0.0
     desc "This control is Non Applicable since no S3 buckets were found."
   end
-
 end

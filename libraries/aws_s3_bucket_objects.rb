@@ -1,3 +1,4 @@
+require 'pp'
 class AwsS3BucketObjects < Inspec.resource(1)
   name 'aws_s3_bucket_objects'
   desc 'List objects within an S3 Bucket'
@@ -37,6 +38,9 @@ class AwsS3BucketObjects < Inspec.resource(1)
         break if api_result.next_continuation_token.nil?
         pagination_opts = { bucket: bucket_name, continuation_token: api_result.next_continuation_token }
       end
+    end
+    @table.each do |entry|
+      entry[:public] = inspec.aws_s3_bucket_object(bucket_name: bucket_name, key: entry[:key]).public?
     end
   end
 
