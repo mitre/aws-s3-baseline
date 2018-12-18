@@ -115,7 +115,10 @@ $ inspec exec /path/to/profile --controls s3-buckets-no-public-access -t aws://
 
 © 2018 The MITRE Corporation.  
 
-Approved for Public Release; Distribution Unlimited. Case Number 18-3678.    
+Approved for Public Release; Distribution Unlimited. Case Number 18-3678.  
+
+### NOTICE
+MITRE hereby grants express written permission to use, reproduce, distribute, modify, and otherwise leverage this software to the extent permitted by the licensed terms provided in the LICENSE.md file included with this project.
 
 ### NOTICE  
 
