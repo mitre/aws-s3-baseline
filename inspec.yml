@@ -5,8 +5,13 @@ copyright: MITRE, 2018
 copyright_email: inspec@mitre.org
 license: Apache-2.0
 version: 1.0.0
+summary: An example baseline to test if you have any public s3 buckets or objects
 supports:
   - platform: aws
-inspec_version: "~> 3.0"
 
-summary: An example baseline to test if you have any public s3 buckets or objects
+attributes:
+  - name: exception_bucket_list
+    description: 'list of buckets exempted from inspection'
+    type: array
+    value:
+      - 'exception_bucket_name'

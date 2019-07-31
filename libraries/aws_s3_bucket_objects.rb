@@ -12,15 +12,14 @@ class AwsS3BucketObjects < Inspec.resource(1)
   include AwsPluralResourceMixin
   attr_reader :bucket_name, :table
 
-
   def validate_params(raw_params)
     validated_params = check_resource_param_names(
       raw_params: raw_params,
       allowed_params: [:bucket_name],
       allowed_scalar_name: :bucket_name,
-      allowed_scalar_type: String,
+      allowed_scalar_type: String
     )
-    if validated_params.empty? or !validated_params.key?(:bucket_name)
+    if validated_params.empty? || !validated_params.key?(:bucket_name)
       raise ArgumentError, 'You must provide a bucket_name to aws_s3_bucket.'
     end
 
@@ -36,6 +35,7 @@ class AwsS3BucketObjects < Inspec.resource(1)
         api_result = backend.list_objects_v2(pagination_opts)
         @table += api_result.contents.map(&:to_h)
         break if api_result.next_continuation_token.nil?
+
         pagination_opts = { bucket: bucket_name, continuation_token: api_result.next_continuation_token }
       end
     end
