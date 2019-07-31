@@ -36,6 +36,14 @@ InSpec uses the standard AWS authentication mechanisms. Typically, you will crea
 
 ## Get started
 
+The following attributes can be configured in an attributes file. More information about InSpec attributes can be found in the [InSpec Profile Documentation](https://www.inspec.io/docs/reference/profiles/).
+ 
+```
+# Description: List of buckets exempted from inspection.
+exception_bucket_list: []
+
+```
+
 Bundle install required gems <br>
 - `bundle install`
 
@@ -99,7 +107,7 @@ $ inspec exec /path/to/profile --controls s3-buckets-no-public-access -t aws://
 ## Contributors + Kudos
 
 - Rony Xavier [rx294](https://github.com/rx294)
-- Matthew Dromazos [rx294](https://github.com/dromazmj)
+- Matthew Dromazos [dromazmj](https://github.com/dromazmj)
 - Aaron Lippold [aaronlippold](https://github.com/aaronlippold)
 
 ## License and Author
@@ -107,7 +115,7 @@ $ inspec exec /path/to/profile --controls s3-buckets-no-public-access -t aws://
 
 ### Authors
 
-- Author:: Rony Xaiver [rxaiver@mitre.org](mailto:rxaiver@mitre.org)
+- Author:: Rony Xavier [rxavier@mitre.org](mailto:rxaiver@mitre.org)
 - Author:: Matthew Dromazos [dromazmj@dukes.jmu.edu](mailto:mattdromazos9@gmail.com )
 - Author:: Aaron Lippold [lippold@gmail.com](mailto:lippold@gmail.com)
 
