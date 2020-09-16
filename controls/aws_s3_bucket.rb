@@ -14,7 +14,7 @@ control 's3-buckets-no-public-access' do
               the buckets found in your review. Select the permisssions tab for
               the bucket and remove the Public access permission."
 
-  exception_bucket_list = attribute('exception_bucket_list')
+  exception_bucket_list = input('exception_bucket_list')
 
   aws_s3_buckets.bucket_names.each do |bucket|
     next if exception_bucket_list.include?(bucket)
