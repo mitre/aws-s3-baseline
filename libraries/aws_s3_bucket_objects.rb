@@ -1,4 +1,6 @@
-require 'pp'
+require "resource_support/aws/aws_plural_resource_mixin"
+require "resource_support/aws/aws_backend_base"
+
 class AwsS3BucketObjects < Inspec.resource(1)
   name 'aws_s3_bucket_objects'
   desc 'List objects within an S3 Bucket'
