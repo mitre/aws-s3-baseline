@@ -14,7 +14,7 @@ control 's3-objects-no-public-access' do
         select the permissions tab for the object and remove
         the Public Access permission."
 
-  exception_bucket_list = attribute('exception_bucket_list')
+  exception_bucket_list = input('exception_bucket_list')
 
   aws_s3_buckets.bucket_names.each do |bucket|
     next if exception_bucket_list.include?(bucket)
