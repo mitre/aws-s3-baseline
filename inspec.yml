@@ -1,14 +1,14 @@
 name: aws-s3-baseline
-title: AWS S3 Public Buckets and Objects Benchmark
+title: aws-s3-baseline
 maintainer: MITRE InSpec Team
 copyright: MITRE, 2018
 copyright_email: inspec@mitre.org
 license: Apache-2.0
-version: 1.0.0
-summary: An example baseline to test if you have any public s3 buckets or objects
+summary: 'InSpec validation example baseline profile for AWS S3 - to test if you have public buckets'
+version: 1.0.1
+inspec_version: ">= 4.0"
 supports:
   - platform: aws
-inspec_version: ">= 4.0"
 
 depends:
   - name: inspec-aws
