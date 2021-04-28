@@ -19,4 +19,4 @@ inputs:
     description: 'list of buckets exempted from inspection'
     type: array
     value:
-      - 'exception_bucket_name'
+      - ''
