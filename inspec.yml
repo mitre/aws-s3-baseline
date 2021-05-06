@@ -5,7 +5,8 @@ copyright: MITRE, 2018
 copyright_email: inspec@mitre.org
 license: Apache-2.0
 summary: 'InSpec validation example baseline profile for AWS S3 - to test if you have public buckets'
-version: 1.0.1
+version: 1.0.3
+
 inspec_version: ">= 4.0"
 supports:
   - platform: aws
@@ -19,4 +20,4 @@ inputs:
     description: 'list of buckets exempted from inspection'
     type: array
     value:
-      - 'exception_bucket_name'
+      - ''
