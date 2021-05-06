@@ -7,7 +7,7 @@ NOTE: Small Word of Warning
 In this InSpec profile implementation, the `s3-objects-no-public-access` control iterates through and verifies every  objects in each bucket in your AWS Environment, thus its runtime will depend on the number of objects in your S3 Buckets.
 
 ## Getting Started
-It is intended and recommended that InSpec and this profile be run from a __"runner"__ host (such as a DevOps orchestration server, an administrative management system, or a developer's workstation/laptop) against the target remotely over __ssh__.
+It is intended and recommended that InSpec and this profile be run from a __"runner"__ host (such as a DevOps orchestration server, an administrative management system, or a developer's workstation/laptop) against the target remotely over __AWS CLI__.
 
 __For the best security of the runner, always install on the runner the _latest version_ of InSpec and supporting Ruby language components.__ 
 
