@@ -20,7 +20,7 @@ control 's3-objects-no-public-access' do
     next if exception_bucket_list.include?(bucket)
 
     describe "Public objects in Bucket: #{bucket}" do
-      subject { aws_s3_bucket_objects(bucket).where { public }.keys }
+      subject { aws_s3_bucket_objects(bucket_name: bucket).where { public }.keys }
       it { should cmp [] }
     end
   end
