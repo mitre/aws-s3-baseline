@@ -16,20 +16,20 @@ control 's3-buckets-no-public-access' do
 
   exception_bucket_list = input('exception_bucket_list')
 
-  aws_s3_buckets.bucket_names.each do |bucket|
-    next if exception_bucket_list.include?(bucket)
-
-    describe aws_s3_bucket(bucket) do
-      it { should_not be_public }
-    end
-  end
-
   if aws_s3_buckets.bucket_names.empty?
     impact 0.0
     desc 'This control is Non Applicable since no S3 buckets were found.'
 
     describe 'This control is Non Applicable since no S3 buckets were found.' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
+    end
+  else
+    aws_s3_buckets.bucket_names.each do |bucket|
+      next if exception_bucket_list.include?(bucket)
+
+      describe aws_s3_bucket(bucket) do
+        it { should_not be_public }
+      end
     end
   end
 end
