@@ -2,7 +2,7 @@ control 's3-objects-no-public-access' do
   impact 0.7
   title 'Ensure there are no publicly accessible S3 objects'
   desc 'Ensure there are no publicly accessible S3 objects'
-  tag "nist": %w[AC-6 Rev_4]
+  tag "nist": %w[AC-6]
   tag "severity": 'high'
 
   tag "check": "Review your AWS console and note if any S3 bucket objects are set to
@@ -26,9 +26,12 @@ control 's3-objects-no-public-access' do
   else
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
-      describe "Public objects in Bucket: #{bucket}" do
-        aws_s3_bucket_objects(bucket_name: bucket).contents_keys.each do |key|
-          describe aws_s3_bucket_object(bucket_name: bucket, key: key) do
+
+      my_items = aws_s3_bucket_objects(bucket_name: bucket).contents_keys
+      describe "#{bucket} object" do
+        my_items.each do |key|
+          describe key.to_s do
+            subject { aws_s3_bucket_object(bucket_name: bucket, key: key) }
             it { should_not be_public }
           end
         end
