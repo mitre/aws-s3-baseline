@@ -2,7 +2,7 @@ control 's3-objects-no-public-access' do
   impact 0.7
   title 'Ensure there are no publicly accessible S3 objects'
   desc 'Ensure there are no publicly accessible S3 objects'
-  tag "nist": ['AC-6', 'Rev_4']
+  tag "nist": %w[AC-6 Rev_4]
   tag "severity": 'high'
 
   tag "check": "Review your AWS console and note if any S3 bucket objects are set to
@@ -16,21 +16,23 @@ control 's3-objects-no-public-access' do
 
   exception_bucket_list = input('exception_bucket_list')
 
-  aws_s3_buckets.bucket_names.each do |bucket|
-    next if exception_bucket_list.include?(bucket)
-
-    describe "Public objects in Bucket: #{bucket}" do
-      subject { aws_s3_bucket_objects(bucket_name: bucket).where { public }.keys }
-      it { should cmp [] }
-    end
-  end
-
   if aws_s3_buckets.bucket_names.empty?
     impact 0.0
     desc 'This control is Non Applicable since no S3 buckets were found.'
 
     describe 'This control is Non Applicable since no S3 buckets were found.' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
+    end
+  else
+    aws_s3_buckets.bucket_names.each do |bucket|
+      next if exception_bucket_list.include?(bucket)
+      describe "Public objects in Bucket: #{bucket}" do
+        aws_s3_bucket_objects(bucket_name: bucket).contents_keys.each do |key|
+          describe aws_s3_bucket_object(bucket_name: bucket, key: key) do
+            it { should_not be_public }
+          end
+        end
+      end
     end
   end
 end
