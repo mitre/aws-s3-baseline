@@ -23,6 +23,16 @@ control 's3-objects-no-public-access' do
     describe 'This control is Non Applicable since no S3 buckets were found.' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
     end
+  elsif !input('single_bucket').to_s.empty?
+    my_items = aws_s3_bucket_objects(bucket_name: input('single_bucket')).contents_keys
+    describe "#{input('single_bucket')} object" do
+      my_items.each do |key|
+        describe key.to_s do
+          subject { aws_s3_bucket_object(bucket_name: input('single_bucket'), key: key) }
+          it { should_not be_public }
+        end
+      end
+    end
   else
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)

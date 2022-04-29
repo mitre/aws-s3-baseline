@@ -23,6 +23,10 @@ control 's3-buckets-no-public-access' do
     describe 'This control is Non Applicable since no S3 buckets were found.' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
     end
+  elsif !input('single_bucket').to_s.empty?
+    describe aws_s3_bucket(input('single_bucket').to_s) do
+      it { should_not be_public }
+    end
   else
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
