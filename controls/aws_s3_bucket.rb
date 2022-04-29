@@ -3,7 +3,7 @@ control 's3-buckets-no-public-access' do
   title 'Ensure there are no publicly accessible S3 buckets'
   desc 'Ensure there are no publicly accessible S3 buckets'
 
-  tag "nist": ['AC-6', 'Rev_4']
+  tag "nist": ['AC-6']
   tag "severity": 'high'
 
   tag "check": "Review your AWS console and note if any S3 buckets are set to
