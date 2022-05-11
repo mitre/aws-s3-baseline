@@ -30,7 +30,8 @@ control 'Public_S3_Buckets' do
   else
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
-      describe "#{bucket}" do
+
+      describe bucket.to_s do
         subject { aws_s3_bucket(bucket) }
         it { should_not be_public }
       end

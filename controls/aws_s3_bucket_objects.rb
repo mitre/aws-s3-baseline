@@ -1,4 +1,4 @@
-require_relative '../libraries/concurent_s3.rb'
+require_relative '../libraries/concurrent_s3'
 
 control 'Public_S3_Objects' do
   impact 0.7
@@ -27,7 +27,7 @@ control 'Public_S3_Objects' do
     end
   elsif input('single_bucket').present?
     public_objects = has_public_objects(input('single_bucket').to_s)
-    describe "#{input('single_bucket').to_s}" do
+    describe input('single_bucket').to_s do
       it 'should not have any public objects' do
         failure_message = public_objects.count > 1 ? "#{public_objects.join(', ')} are public" : "#{public_objects.join(', ')} is public"
         expect(public_objects).to be_empty, failure_message
@@ -36,8 +36,9 @@ control 'Public_S3_Objects' do
   else
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
+
       public_objects_multi = has_public_objects(bucket.to_s)
-      describe "#{bucket}" do
+      describe bucket.to_s do
         it 'should not have any public objects' do
           failure_message = "#{public_objects_multi.join(', ')} is public"
           expect(public_objects_multi).to be_empty, failure_message
