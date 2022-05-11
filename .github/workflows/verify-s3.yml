@@ -42,6 +42,10 @@ jobs:
         run: bundle exec inspec check . --auto-install-gems
       - name: Run Inspec test
         run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json || true
+      - name: Save Test Result JSON
+        uses: actions/upload-artifact@v2
+        with:
+          path: .
       - name: Display our results summary
         uses: mitre/saf_action@v1
         with:
@@ -50,7 +54,3 @@ jobs:
         uses: mitre/saf_action@v1
         with:
           command_string: 'validate:threshold -i results.json -F threshold.yml'
-      - name: Save Test Result JSON
-        uses: actions/upload-artifact@v2
-        with:
-          path: .
