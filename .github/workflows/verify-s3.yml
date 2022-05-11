@@ -37,9 +37,9 @@ jobs:
       - name: Bundle install gems
         run: bundle install
       - name: Vendor the Inspec profile
-        run: bundle exec inspec vendor .
+        run: bundle exec inspec vendor . 
       - name: Lint the Inspec profile
-        run: bundle exec inspec check .
+        run: bundle exec inspec check . --auto-install-gems
       - name: Run Inspec test
         run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json
       - name: Display our results summary
