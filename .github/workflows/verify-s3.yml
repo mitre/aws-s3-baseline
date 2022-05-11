@@ -45,7 +45,7 @@ jobs:
       - name: Save Test Result JSON
         uses: actions/upload-artifact@v2
         with:
-          path: .
+          path: ./results.json
       - name: Display our results summary
         uses: mitre/saf_action@v1
         with:
