@@ -1,5 +1,3 @@
-require 'pry'
-require 'pry-byebug'
 require 'concurrent'
 module Aws::S3
   class Bucket
@@ -92,13 +90,12 @@ control 's3-objects-no-public-access' do
     end
   else
     aws_s3_buckets.bucket_names.each do |bucket|
-      #next if exception_bucket_list.include?(bucket)
-      public_objects = has_public_objects(bucket.to_s)
-      binding.pry
+      next if exception_bucket_list.include?(bucket)
+      public_objects_multi = has_public_objects(bucket.to_s)
       describe "This bucket #{bucket}" do
         it 'should not have Public Objects' do
-          failure_message = "The following items are public: #{public_objects.join(', ')}"
-          expect(public_objects).to be_empty, failure_message
+          failure_message = "The following items are public: #{public_objects_multi.join(', ')}"
+          expect(public_objects_multi).to be_empty, failure_message
         end
       end
     end
