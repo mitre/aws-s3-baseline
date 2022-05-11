@@ -43,7 +43,7 @@ jobs:
       - name: Run Inspec test
         run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json || true
       - name: Save Test Result JSON
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ./results.json
       - name: Display our results summary
