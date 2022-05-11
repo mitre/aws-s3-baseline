@@ -36,10 +36,12 @@ jobs:
         run: 'echo "gem: --no-ri --no-rdoc" >> ~/.gemrc'
       - name: Bundle install gems
         run: bundle install
+      - name: Vendor the Inspec profile
+        run: bundle exec inspec vendor .
       - name: Lint the Inspec profile
         run: bundle exec inspec check .
       - name: Run Inspec test
-        run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --target aws:// --reporter cli json:results.json
+        run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json
       - name: Display our results summary
         uses: mitre/saf_action@v1
         with:
