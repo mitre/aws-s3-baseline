@@ -37,19 +37,19 @@ jobs:
       - name: Bundle install gems
         run: bundle install
       - name: Vendor the Inspec profile
-        run: bundle exec inspec vendor . 
+        run: bundle exec inspec vendor .
       - name: Lint the Inspec profile
         run: bundle exec inspec check . --auto-install-gems
       - name: Run Inspec test
-        run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json
+        run: bundle exec inspec exec . --input single_bucket=${{ secrets.BUCKET_W_PUB_OBJ }} --auto-install-gems --target aws:// --reporter cli json:results.json || true
       - name: Display our results summary
         uses: mitre/saf_action@v1
         with:
           command_string: 'view:summary -i results.json'
-      #- name: Ensure the scan meets our results threshold
-      #  uses: mitre/saf_action@v1
-      #  with:
-      #    command_string: 'validate:threshold -i spec/results/ec2_rhel-7_${{ matrix.suite }}.json -F ${{ matrix.suite }}.threshold.yml'
+      - name: Ensure the scan meets our results threshold
+        uses: mitre/saf_action@v1
+        with:
+          command_string: 'validate:threshold -i results.json -F threshold.yml'
       - name: Save Test Result JSON
         uses: actions/upload-artifact@v2
         with:
