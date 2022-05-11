@@ -12,6 +12,10 @@ inspec_version: ">= 4.0"
 supports:
   - platform: aws
 
+gem_dependencies:
+  - name: "concurrent-ruby"
+    version: ">= 1.1.10"
+    
 depends:
   - name: inspec-aws
     url: https://github.com/inspec/inspec-aws/archive/main.tar.gz
@@ -26,3 +30,4 @@ inputs:
     description: "The name of the single bucket you wish to scan"
     type: string
     value: ""
+
