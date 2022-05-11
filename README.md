@@ -2,11 +2,24 @@
 
 A micro-baseline to check for insecure or public S3 buckets and bucket objects in your AWS Environment. This [InSpec](https://github.com/chef/inspec) compliance profile verifies that you do not have any insure or open to public S3 Bucket or Bucket Objects in your AWS Environment in an automated way.
 
+### Required Gems:
+
+This profile requires the following gems:
+
+  - `inspec`
+  - `inspec-bin`
+  - `aws-sdk-s3`
+  - `concurrent-ruby`
+
 #### Warning: Large amounts of Bucket Objects
 
 The `s3-objects-no-public-access` control iterates through and verifies every objects in each bucket in your AWS Environment, thus its runtime will depend on the number of objects in your S3 Buckets.
 
+On average the profile can process around 500 - 1000 objects/sec.
+
 If you have buckets with large numbers of objects, we suggest you script a loop and use the `single_bucket` input to parallelize the workload.
+
+To see the processing in more details use the `-l debug` flag to get verbose output.
 
 Then you can load all your HDF JSON results into [Heimdall Lite](https://heimdall-lite.mitre.org) to easily review all your scan results.
 

@@ -1,38 +1,6 @@
-require 'concurrent'
-module Aws::S3
-  class Bucket
-    def objects(options = {})
-      batches = Enumerator.new do |y|
-        options = options.merge(bucket: @name)
-        resp = @client.list_objects_v2(options)
-        resp.each_page do |page|
-          batch = []
-          pool = Concurrent::FixedThreadPool.new(16)
-          mutex = Mutex.new
-          page.data.contents.each do |c|
-            #binding.pry
-            pool.post do
-              mutex.synchronize do
-                batch << ObjectSummary.new(
-                  bucket_name: @name,
-                  key: c.key,
-                  data: c,
-                  client: @client
-                )
-              end
-            end
-          end
-          pool.shutdown
-          pool.wait_for_termination
-          y.yield(batch)
-        end
-      end
-      ObjectSummary::Collection.new(batches)
-    end
-  end
-end
+require_relative '../libraries/concurent_s3.rb'
 
-control 's3-objects-no-public-access' do
+control 'Public_S3_Objects' do
   impact 0.7
   title 'Ensure there are no publicly accessible S3 objects'
   desc 'Ensure there are no publicly accessible S3 objects'
@@ -50,29 +18,6 @@ control 's3-objects-no-public-access' do
 
   exception_bucket_list = input('exception_bucket_list')
 
-  def has_public_objects(myBucket)
-
-    myPublicKeys = []
-    s3 = Aws::S3::Resource.new()
-    pool = Concurrent::FixedThreadPool.new(56)
-    mutex = Mutex.new
-    s3.bucket(myBucket).objects.each do |object|
-      pool.post do
-        grants = object.acl.grants 
-        if grants.map { |x| x.grantee.type }.any? { |x| x =~ %r{Group} }
-          if grants.map { |x| x.grantee.uri }.any? { |x| x =~ %r{AllUsers|AuthenticatedUsers} }
-            mutex.synchronize do
-            myPublicKeys << object.key
-            end
-              end
-        end
-        end
-    end  
-    pool.shutdown
-    pool.wait_for_termination
-    myPublicKeys
-  end
-
   if aws_s3_buckets.bucket_names.empty?
     impact 0.0
     desc 'This control is Non Applicable since no S3 buckets were found.'
@@ -80,11 +25,11 @@ control 's3-objects-no-public-access' do
     describe 'This control is Non Applicable since no S3 buckets were found.' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
     end
-  elsif !input('single_bucket').to_s.empty?
+  elsif input('single_bucket').present?
     public_objects = has_public_objects(input('single_bucket').to_s)
-    describe "This bucket #{input('single_bucket').to_s}" do
-      it 'should not have Public Objects' do
-        failure_message = "The following items are public: #{public_objects.join(', ')}"
+    describe "#{input('single_bucket').to_s}" do
+      it 'should not have any public objects' do
+        failure_message = public_objects.count > 1 ? "#{public_objects.join(', ')} are public" : "#{public_objects.join(', ')} is public"
         expect(public_objects).to be_empty, failure_message
       end
     end
@@ -92,9 +37,9 @@ control 's3-objects-no-public-access' do
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
       public_objects_multi = has_public_objects(bucket.to_s)
-      describe "This bucket #{bucket}" do
-        it 'should not have Public Objects' do
-          failure_message = "The following items are public: #{public_objects_multi.join(', ')}"
+      describe "#{bucket}" do
+        it 'should not have any public objects' do
+          failure_message = "#{public_objects_multi.join(', ')} is public"
           expect(public_objects_multi).to be_empty, failure_message
         end
       end
