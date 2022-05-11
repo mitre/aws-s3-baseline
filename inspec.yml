@@ -5,16 +5,12 @@ copyright: MITRE, 2022
 copyright_email: inspec@mitre.org
 license: Apache-2.0
 summary: "InSpec validation example baseline profile for AWS S3 - to test if you have public buckets"
-version: 1.4.1
+version: 1.5.0
 
-inspec_version: ">= 5.14"
+inspec_version: ">= 4"
 
 supports:
   - platform: aws
-
-gem_dependencies:
-  - name: "concurrent-ruby"
-    version: ">= 1.1.10"
 
 depends:
   - name: inspec-aws
