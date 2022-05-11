@@ -31,7 +31,7 @@ module Aws::S3
   end
 end
 
-def has_public_objects(myBucket)
+def get_public_objects(myBucket)
   Inspec::Log.debug "Processing Bucket: #{myBucket}"
   myPublicKeys = []
   s3 = Aws::S3::Resource.new

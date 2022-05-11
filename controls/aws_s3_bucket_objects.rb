@@ -26,7 +26,7 @@ control 'Public_S3_Objects' do
       skip 'This control is Non Applicable since no S3 buckets were found.'
     end
   elsif input('single_bucket').present?
-    public_objects = has_public_objects(input('single_bucket').to_s)
+    public_objects = get_public_objects(input('single_bucket').to_s)
     describe input('single_bucket').to_s do
       it 'should not have any public objects' do
         failure_message = public_objects.count > 1 ? "#{public_objects.join(', ')} are public" : "#{public_objects.join(', ')} is public"
@@ -37,7 +37,7 @@ control 'Public_S3_Objects' do
     aws_s3_buckets.bucket_names.each do |bucket|
       next if exception_bucket_list.include?(bucket)
 
-      public_objects_multi = has_public_objects(bucket.to_s)
+      public_objects_multi = get_public_objects(bucket.to_s)
       describe bucket.to_s do
         it 'should not have any public objects' do
           failure_message = "#{public_objects_multi.join(', ')} is public"
