@@ -2,26 +2,28 @@
 
 A micro-baseline to check for insecure or public S3 buckets and bucket objects in your AWS Environment. This [InSpec](https://github.com/chef/inspec) compliance profile verifies that you do not have any insure or open to public S3 Bucket or Bucket Objects in your AWS Environment in an automated way.
 
-### Required Gems:
+### Required Gems
 
 This profile requires the following gems:
 
-  - `inspec`
-  - `inspec-bin`
-  - `aws-sdk-s3`
-  - `concurrent-ruby`
+- `inspec`
+- `inspec-bin`
+- `aws-sdk-s3`
+- `concurrent-ruby` (v1.1.0 or higher)
 
-#### Warning: Large amounts of Bucket Objects
+Please **install these gems** in the ruby environment that InSpec is using prior to executing the profile.
 
-The `s3-objects-no-public-access` control iterates through and verifies every objects in each bucket in your AWS Environment, thus its runtime will depend on the number of objects in your S3 Buckets.
+### Large Buckets and Profile Runtime
 
-On average the profile can process around 500 - 1000 objects/sec.
+The `s3-objects-no-public-access` control iterates through every object in each bucket in your AWS environment. The runtime will depend on the number of objects in your S3 Buckets.
+
+On average the profile can process around ~1000 objects/sec.
 
 If you have buckets with large numbers of objects, we suggest you script a loop and use the `single_bucket` input to parallelize the workload.
 
 To see the processing in more details use the `-l debug` flag to get verbose output.
 
-Then you can load all your HDF JSON results into [Heimdall Lite](https://heimdall-lite.mitre.org) to easily review all your scan results.
+Then you can load all your HDF JSON results into [Heimdall Lite](https://heimdall-lite.mitre.org) to easily review all your scan results from the multiple runs by loading them in Heimdall.
 
 ## Getting Started
 
@@ -83,6 +85,16 @@ $ export AWS_ACCESS_KEY_ID=key-id
 $ export AWS_SECRET_ACCESS_KEY=access-key
 $ export AWS_SESSION_TOKEN=session-token # if MFA is enabled
 ```
+
+## Installing the needed Gems
+
+### Plain Old Ruby Environment
+
+- `gem install concurrent-ruby`
+
+### Using a Chef or CINC Omnibus Installation
+
+- `chef gem install concurrent-ruby`
 
 ## Running This Baseline Directly from Github
 
