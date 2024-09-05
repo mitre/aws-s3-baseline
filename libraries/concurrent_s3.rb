@@ -1,3 +1,16 @@
+##
+# The above functions utilize multithreading with a thread pool to efficiently process objects in an
+# AWS S3 bucket and identify public objects based on their ACL grants.
+#
+# Args:
+#   myBucket: The code you provided defines methods to retrieve public objects from an AWS S3 bucket
+# using multi-threading for improved performance. The `get_public_objects` method iterates over the
+# objects in the specified S3 bucket, checks their ACL permissions, and collects the keys of objects
+# that are publicly accessible.
+#
+# Returns:
+#   The `get_public_objects` method returns an array of keys for objects in a specified S3 bucket that
+# have public access permissions for all users or authenticated users.
 require "concurrent"
 require "aws-sdk-s3"
 
@@ -27,15 +40,18 @@ module Aws::S3
                       data: c,
                       client: @client
                     )
+                  rescue Aws::S3::Errors::PermanentRedirect => e
+                    # Handle endpoint redirection error
+                    Inspec::Log.debug "Permanent redirect for object #{c.key}: #{e.message}"
                   rescue => e
-                    # Handle or log the error
-                    Inspec::Log.error "Error processing object #{c.key}: #{e.message}"
-                    Inspec::Log.error "Backtrace: #{e.backtrace.join("\n")}"
+                    # Handle or log other errors
+                    Inspec::Log.debug "Error processing object #{c.key}: #{e.message}"
+                    Inspec::Log.debug "Backtrace: #{e.backtrace.join("\n")}"
                   end
                 end
               rescue Concurrent::RejectedExecutionError => e
                 # Handle the rejected execution error
-                Inspec::Log.error "Task submission rejected for object #{c.key}: #{e.message}"
+                Inspec::Log.debug "Task submission rejected for object #{c.key}: #{e.message}"
                 log_thread_pool_status(pool, "RejectedExecutionError")
               end
             end
@@ -52,10 +68,12 @@ module Aws::S3
     private
 
     def log_thread_pool_status(pool, context)
-      Inspec::Log.error "Thread pool status (#{context}):"
-      Inspec::Log.error "  Pool size: #{pool.length}"
-      Inspec::Log.error "  Queue length: #{pool.queue_length}"
-      Inspec::Log.error "  Completed tasks: #{pool.completed_task_count}"
+      if Inspec::Log.level == :debug
+        Inspec::Log.debug "Thread pool status (#{context}):"
+        Inspec::Log.debug "  Pool size: #{pool.length}"
+        Inspec::Log.debug "  Queue length: #{pool.queue_length}"
+        Inspec::Log.debug "  Completed tasks: #{pool.completed_task_count}"
+      end
     end
   end
 end
@@ -67,55 +85,70 @@ def get_public_objects(myBucket)
   log_thread_pool_status(pool, "Initialized")
   debug_mode = Inspec::Log.level == :debug
 
-  bucket = s3.bucket(myBucket)
-  object_count = bucket.objects.count
+  begin
+    bucket = s3.bucket(myBucket)
+    object_count = bucket.objects.count
 
-  if debug_mode
-    Inspec::Log.debug "### Processing Bucket ### : #{myBucket} with #{object_count} objects"
-  end
-
-  # Check if the bucket has no objects
-  return myPublicKeys if object_count.zero?
-
-  bucket.objects.each do |object|
-    Inspec::Log.debug "    Examining Key: #{object.key}" if debug_mode
-    begin
-      pool.post do
-        begin
-          grants = object.acl.grants
-          if grants.map { |x| x.grantee.type }.any? { |x| x =~ /Group/ } &&
-               grants
-                 .map { |x| x.grantee.uri }
-                 .any? { |x| x =~ /AllUsers|AuthenticatedUsers/ }
-            myPublicKeys << object.key
-          end
-        rescue Aws::S3::Errors::AccessDenied => e
-          # Handle access denied error
-          Inspec::Log.error "Access denied for object #{object.key}: #{e.message}"
-        rescue => e
-          # Handle or log other errors
-          Inspec::Log.error "Error processing object #{object.key}: #{e.message}"
-          Inspec::Log.error "Backtrace: #{e.backtrace.join("\n")}"
-        end
-      end
-    rescue Concurrent::RejectedExecutionError => e
-      # Handle the rejected execution error
-      Inspec::Log.error "Task submission rejected for object #{object.key}: #{e.message}"
-      log_thread_pool_status(pool, "RejectedExecutionError")
+    if debug_mode
+      Inspec::Log.debug "### Processing Bucket ### : #{myBucket} with #{object_count} objects"
     end
+
+    # Check if the bucket has no objects
+    return myPublicKeys if object_count.zero?
+
+    bucket.objects.each do |object|
+      Inspec::Log.debug "    Examining Key: #{object.key}" if debug_mode
+      begin
+        pool.post do
+          begin
+            grants = object.acl.grants
+            if grants.map { |x| x.grantee.type }.any? { |x| x =~ /Group/ } &&
+                 grants
+                   .map { |x| x.grantee.uri }
+                   .any? { |x| x =~ /AllUsers|AuthenticatedUsers/ }
+              myPublicKeys << object.key
+            end
+          rescue Aws::S3::Errors::AccessDenied => e
+            # Handle access denied error
+            Inspec::Log.debug "Access denied for object #{object.key}: #{e.message}"
+          rescue Aws::S3::Errors::PermanentRedirect => e
+            # Handle endpoint redirection error
+            Inspec::Log.debug "Permanent redirect for object #{object.key}: #{e.message}"
+          rescue => e
+            # Handle or log other errors
+            Inspec::Log.debug "Error processing object #{object.key}: #{e.message}"
+            Inspec::Log.debug "Backtrace: #{e.backtrace.join("\n")}"
+          end
+        end
+      rescue Concurrent::RejectedExecutionError => e
+        # Handle the rejected execution error
+        Inspec::Log.debug "Task submission rejected for object #{object.key}: #{e.message}"
+        log_thread_pool_status(pool, "RejectedExecutionError")
+      end
+    end
+
+    # Ensure all tasks are completed before shutting down the pool
+    pool.shutdown
+    pool.wait_for_termination
+  rescue Aws::S3::Errors::PermanentRedirect => e
+    # Handle endpoint redirection error for the bucket
+    Inspec::Log.debug "Permanent redirect for bucket #{myBucket}: #{e.message}"
+  rescue => e
+    # Handle or log other errors
+    Inspec::Log.debug "Error accessing bucket #{myBucket}: #{e.message}"
+    Inspec::Log.debug "Backtrace: #{e.backtrace.join("\n")}"
+  ensure
+    pool.shutdown if pool
   end
 
-  # Ensure all tasks are completed before shutting down the pool
-  pool.shutdown
-  pool.wait_for_termination
   myPublicKeys
-ensure
-  pool.shutdown if pool
 end
 
 def log_thread_pool_status(pool, context)
-  Inspec::Log.error "Thread pool status (#{context}):"
-  Inspec::Log.error "  Pool size: #{pool.length}"
-  Inspec::Log.error "  Queue length: #{pool.queue_length}"
-  Inspec::Log.error "  Completed tasks: #{pool.completed_task_count}"
+  if Inspec::Log.level == :debug
+    Inspec::Log.debug "Thread pool status (#{context}):"
+    Inspec::Log.debug "  Pool size: #{pool.length}"
+    Inspec::Log.debug "  Queue length: #{pool.queue_length}"
+    Inspec::Log.debug "  Completed tasks: #{pool.completed_task_count}"
+  end
 end

@@ -268,6 +268,7 @@ GEM
     bigdecimal (3.1.8)
     bson (4.15.0)
     builder (3.3.0)
+    byebug (11.1.3)
     chef-config (18.5.0)
       addressable
       chef-utils (= 18.5.0)
@@ -506,6 +507,9 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-byebug (3.10.1)
+      byebug (~> 11.0)
+      pry (>= 0.13, < 0.15)
     public_suffix (6.0.1)
     racc (1.8.1)
     rainbow (3.1.1)
@@ -739,6 +743,7 @@ DEPENDENCIES
   concurrent-ruby
   inspec
   inspec-bin
+  pry-byebug
 
 BUNDLED WITH
    2.4.22
