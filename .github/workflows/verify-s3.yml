@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CHEF_LICENSE: accept-silent
+      CHEF_LICENSE_KEY: ${{ secrets.SAF_CHEF_LICENSE_KEY }}
     steps:
       - name: add needed packages
         run: sudo apt-get install -y jq
