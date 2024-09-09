@@ -1,29 +1,45 @@
 name: aws-s3-baseline
 title: aws-s3-baseline
-maintainer: MITRE InSpec Team
-copyright: MITRE, 2022
-copyright_email: inspec@mitre.org
+maintainer: MITRE Security Automation Framework Team
+copyright: The MITRE Corporation, 2024
+copyright_email: saf@groups.mitre.org
 license: Apache-2.0
-summary: "InSpec profile to test if you have public buckets or objects"
-version: 1.5.2
+summary: "Example inspec profile to test for any public s3 buckets or buckets with public objects and use of a local support library to speed up testing using concurrent-ruby"
+version: 2.0.0
 
-inspec_version: ">= 4.0"
+inspec_version: ">= 5.0"
 
 supports:
-  - platform: aws
+- platform: aws
 
 depends:
-  - name: inspec-aws
-    url: https://github.com/inspec/inspec-aws/archive/main.tar.gz
+- name: inspec-aws
+  git: https://github.com/inspec/inspec-aws.git
+
+gems:
+- name: concurrent-ruby
 
 inputs:
-  - name: single_bucket
-    description: "The name of the single bucket you wish to scan"
-    type: string
-    value: ""
+- name: single_bucket
+  description: "The name of the single bucket you wish to scan"
+  type: String
+  value: ""
 
-  - name: exception_bucket_list
-    description: "List of buckets that should be exempted from review"
-    type: array
-    value:
-      - ""
+- name: exempt_buckets
+  description: "List of buckets that should be exempted from review"
+  type: Array
+  value: []
+
+- name: test_buckets
+  description: "List of buckets to test"
+  type: Array
+  value: []
+
+- name: list_public_s3_objects_params
+  description: "Parameters for the list_public_s3_objects function"
+  type: Hash
+  value:
+    thread_pool_size: 20
+    batch_size: 100
+    max_retries: 1
+    retry_delay: 0.5
