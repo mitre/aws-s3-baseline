@@ -1,5 +1,4 @@
 require "concurrent"
-require "aws-sdk-s3"
 
 module Aws::S3
   class Bucket
@@ -80,9 +79,11 @@ def get_public_objects(myBucket)
           end
         rescue Aws::S3::Errors::PermanentRedirect => e
           Inspec::Log.warn "Permanent redirect for object #{object.key}: #{e.message}"
+          skip_resource "Skipping object #{object.key} due to permanent redirect: #{e.message}"
         rescue => e
           Inspec::Log.warn "Error processing object #{object.key}: #{e.message}"
           Inspec::Log.warn "Backtrace: #{e.backtrace.join("\n")}"
+          skip_resource "Skipping object #{object.key} due to error: #{e.message}"
         end
       end
     end
