@@ -18,13 +18,13 @@ jobs:
         run: sudo apt-get install -y jq
       - name: Configure AWS credentials
         env:
-          AWS_SG_ID: ${{ secrets.AWS_SG_ID }}
-          AWS_SUBNET_ID: ${{ secrets.AWS_SUBNET_ID }}
+          AWS_SG_ID: ${{ secrets.SAF_AWS_SG_ID }}
+          AWS_SUBNET_ID: ${{ secrets.SAF_AWS_SUBNET_ID }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.SAF_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SAF_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.SAF_AWS_REGION }}
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Clone full repository so we can push
@@ -32,7 +32,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1.2"
+          ruby-version: '3.1.2'
       - name: Disable ri and rdoc
         run: 'echo "gem: --no-ri --no-rdoc" >> ~/.gemrc'
       - name: Bundle install gems
@@ -50,8 +50,8 @@ jobs:
       - name: Display our results summary
         uses: mitre/saf_action@v1
         with:
-          command_string: "view:summary -i results.json"
+          command_string: 'view:summary -i results.json'
       - name: Ensure the scan meets our results threshold
         uses: mitre/saf_action@v1
         with:
-          command_string: "validate:threshold -i results.json -F threshold.yml"
+          command_string: 'validate:threshold -i results.json -F threshold.yml'
